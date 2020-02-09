@@ -13,7 +13,7 @@ namespace Completed
 		public float turnDelay = 0.1f;							//Delay between each Player turn.
 		public int playerFoodPoints = 100;						//Starting value for Player food points.
 		public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
-		[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
+		[HideInInspector] public int playersTurn = 0;		//-1 means enemy turn, rest are indexes of players, used to know who's turn it is, hidden in inspector but public.
 		
 		
 		private Text levelText;									//Text to display current level number.
@@ -22,9 +22,9 @@ namespace Completed
 		private int level = 1;									//Current level number, expressed in game as "Day 1".
 		private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 		private bool enemiesMoving;								//Boolean to check if enemies are moving.
-		private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
-		
-		
+		private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
+
+		private List<int> playerIndexes = new List<int>();
 		
 		//Awake is always called before any Start functions
 		void Awake()
@@ -43,7 +43,7 @@ namespace Completed
 			
 			//Sets this to not be destroyed when reloading scene
 			DontDestroyOnLoad(gameObject);
-			
+
 			//Assign enemies to a new List of Enemy objects.
 			enemies = new List<Enemy>();
 			
@@ -54,9 +54,19 @@ namespace Completed
 			InitGame();
 		}
 
-        //this is called only once, and the paramter tell it to be called only after the scene was loaded
-        //(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+		void Start()
+		{
+			//Assign indexes of players.
+			List<Player> players = new List<Player>(GameObject.FindObjectsOfType<Player>());
+
+			foreach (Player p in players) playerIndexes.Add(p.PlayerId);
+			playerIndexes.Sort(); // Sort by ascending (Smallest to biggest)
+			playersTurn = playerIndexes[0];
+		}
+
+		//this is called only once, and the paramter tell it to be called only after the scene was loaded
+		//(otherwise, our Scene Load callback would be called the very first load, and we don't want that)
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static public void CallbackInitialization()
         {
             //register the callback to be called everytime the scene is loaded
@@ -114,8 +124,8 @@ namespace Completed
 		//Update is called every frame.
 		void Update()
 		{
-			//Check that playersTurn or enemiesMoving or doingSetup are not currently true.
-			if(playersTurn || enemiesMoving || doingSetup)
+			//Check that it's not a players turn or that enemiesMoving or doingSetup are not currently true.
+			if(playersTurn != -1 || enemiesMoving || doingSetup)
 				
 				//If any of these are true, return and do not start MoveEnemies.
 				return;
@@ -134,6 +144,22 @@ namespace Completed
 		public void SetupPlayerPosition(Transform tr)
 		{
 			tr.position = boardScript.NextPositionPlayer();
+		}
+
+		public void NextRound()
+		{
+			if (playerIndexes.FindIndex(x => x == playersTurn) == playerIndexes.Count - 1) // If last element, next is -1 (enemies)
+			{
+				playersTurn = -1;
+			}
+			else if (playersTurn == -1) // If -1, next if first element (first player)
+			{
+				playersTurn = playerIndexes[0];
+			}
+			else // Else go to next element
+			{
+				playersTurn = playerIndexes[playerIndexes.FindIndex(x => x == playersTurn) + 1];
+			}
 		}
 
 		//GameOver is called when the player reaches 0 food points
@@ -174,8 +200,8 @@ namespace Completed
 				//Wait for Enemy's moveTime before moving next Enemy, 
 				yield return new WaitForSeconds(enemies[i].moveTime);
 			}
-			//Once Enemies are done moving, set playersTurn to true so player can move.
-			playersTurn = true;
+			//Once Enemies are done moving, set playersTurn to the index of the first player so the first player may move.
+			playersTurn = 0;
 			
 			//Enemies are done moving, set enemiesMoving to false.
 			enemiesMoving = false;
