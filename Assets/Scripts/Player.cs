@@ -45,6 +45,8 @@ namespace Completed
 			
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
+
+			GameManager.instance.SetupPlayerPosition(transform);
 		}
 		
 		

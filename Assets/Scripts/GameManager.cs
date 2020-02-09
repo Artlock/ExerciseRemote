@@ -130,8 +130,12 @@ namespace Completed
 			//Add Enemy to List enemies.
 			enemies.Add(script);
 		}
-		
-		
+
+		public void SetupPlayerPosition(Transform tr)
+		{
+			tr.position = boardScript.NextPositionPlayer();
+		}
+
 		//GameOver is called when the player reaches 0 food points
 		public void GameOver()
 		{
