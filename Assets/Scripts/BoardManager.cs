@@ -40,7 +40,8 @@ namespace Completed
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
 		private List <Vector3> gridPositions = new List <Vector3> ();   //A list of possible locations to place tiles.
-		private List<Vector3> playerPositions = new List<Vector3>();   //A list of possible locations to spawn players.
+		private List<Vector3> playerPositions = new List<Vector3>();	//A list of possible locations to spawn players.
+		private Vector3 defaultPositionPlayer;							//First element of the above list.
 		private int currentColumns;
 		private int currentRows;
 
@@ -91,6 +92,29 @@ namespace Completed
 
 			// Remove duplicates (1 at least, the bottom left position)
 			playerPositions = playerPositions.Distinct().ToList();
+
+			// Set first element to keep in case our list ends up empty
+			defaultPositionPlayer = playerPositions[0];
+		}
+
+
+		//Return the next available position to spawn a player.
+		public Vector3 NextPositionPlayer()
+		{
+			// Failsafe.
+			if (playerPositions.Count == 0)
+			{
+				return defaultPositionPlayer;
+			}
+
+			// Take the first available position.
+			Vector3 nextPosition = playerPositions[0];
+
+			//Remove said position from list of available positions.
+			playerPositions.RemoveAt(0);
+
+			//Return the selected Vector3 position.
+			return nextPosition;
 		}
 
 
