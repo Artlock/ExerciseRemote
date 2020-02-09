@@ -126,6 +126,8 @@ namespace Completed
 		{
 			//Choose a random number of objects to instantiate within the minimum and maximum limits
 			int objectCount = Random.Range (minimum, maximum+1);
+
+			if (objectCount > gridPositions.Count) return;
 			
 			//Instantiate objects until the randomly chosen limit objectCount is reached
 			for(int i = 0; i < objectCount; i++)
