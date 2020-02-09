@@ -29,24 +29,6 @@ namespace Completed
         private Vector2 touchOrigin = -Vector2.one;	//Used to store location of screen touch origin for mobile controls.
 #endif
 
-		private void Awake()
-		{
-			//Failsafe in case both players are setup with same index.
-			List<Player> players = new List<Player>(GameObject.FindObjectsOfType<Player>());
-			players.Remove(this); // Remove self to avoid endless loop.
-			while (IndexAlreadyAssigned(players, PlayerId)) PlayerId++;
-		}
-
-		private bool IndexAlreadyAssigned(List<Player> players, int index)
-		{
-			foreach (Player pl in players)
-			{
-				if (pl.PlayerId == index) return true;
-			}
-
-			return false;
-		}
-
 		//Start overrides the Start function of MovingObject
 		protected override void Start ()
 		{
@@ -60,7 +42,7 @@ namespace Completed
 			//Call the Start function of the MovingObject base class.
 			base.Start ();
 
-			GameManager.instance.SetupPlayerPosition(transform);
+			GameManager.instance.SetupPlayerPosition(transform, PlayerId);
 		}
 		
 		

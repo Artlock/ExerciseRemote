@@ -40,7 +40,8 @@ namespace Completed
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
 		private List <Vector3> gridPositions = new List <Vector3> ();   //A list of possible locations to place tiles.
-		private List<Vector3> playerPositions = new List<Vector3>();	//A list of possible locations to spawn players.
+		private List<Vector3> playerPositions = new List<Vector3>();    //A list of possible locations to spawn players.
+		private List<Vector3> playerPositionsTaken = new List<Vector3>();//A list of taken locations to spawn players.
 		private Vector3 defaultPositionPlayer;							//First element of the above list.
 		private int currentColumns;
 		private int currentRows;
@@ -69,8 +70,9 @@ namespace Completed
 		
 		void InitialisePlayerPositions()
 		{
-			//Clear our list playerPositions.
+			//Clear our list playerPositions and playerPositionsTaken.
 			playerPositions.Clear();
+			playerPositionsTaken.Clear();
 
 			// Add bottom line to spawn positions.
 
@@ -99,19 +101,32 @@ namespace Completed
 
 
 		//Return the next available position to spawn a player.
-		public Vector3 NextPositionPlayer()
+		public Vector3 NextPositionPlayer(int index)
 		{
 			// Failsafe.
-			if (playerPositions.Count == 0)
+			if (playerPositions.Count == playerPositionsTaken.Count)
 			{
 				return defaultPositionPlayer;
 			}
 
-			// Take the first available position.
-			Vector3 nextPosition = playerPositions[0];
+			Vector3 nextPosition;
+
+			// Try and spawn at the requested position.
+			if (!playerPositionsTaken.Contains(playerPositions[index]))
+			{
+				// If available spawn there
+				nextPosition = playerPositions[index];
+			}
+			else
+			{
+				// Else spawn in the first slot available
+				int i = 0;
+				while (playerPositionsTaken.Contains(playerPositions[i])) i++;
+				nextPosition = playerPositions[i];
+			}
 
 			//Remove said position from list of available positions.
-			playerPositions.RemoveAt(0);
+			playerPositionsTaken.Add(nextPosition);
 
 			//Return the selected Vector3 position.
 			return nextPosition;

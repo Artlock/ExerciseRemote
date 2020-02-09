@@ -44,6 +44,13 @@ namespace Completed
 			//Sets this to not be destroyed when reloading scene
 			DontDestroyOnLoad(gameObject);
 
+			//Assign indexes of players.
+			List<Player> players = new List<Player>(GameObject.FindObjectsOfType<Player>());
+
+			foreach (Player p in players) playerIndexes.Add(p.PlayerId);
+			playerIndexes.Sort(); // Sort by ascending (Smallest to biggest)
+			playersTurn = playerIndexes[0];
+
 			//Assign enemies to a new List of Enemy objects.
 			enemies = new List<Enemy>();
 			
@@ -52,16 +59,6 @@ namespace Completed
 			
 			//Call the InitGame function to initialize the first level 
 			InitGame();
-		}
-
-		void Start()
-		{
-			//Assign indexes of players.
-			List<Player> players = new List<Player>(GameObject.FindObjectsOfType<Player>());
-
-			foreach (Player p in players) playerIndexes.Add(p.PlayerId);
-			playerIndexes.Sort(); // Sort by ascending (Smallest to biggest)
-			playersTurn = playerIndexes[0];
 		}
 
 		//this is called only once, and the paramter tell it to be called only after the scene was loaded
@@ -141,9 +138,9 @@ namespace Completed
 			enemies.Add(script);
 		}
 
-		public void SetupPlayerPosition(Transform tr)
+		public void SetupPlayerPosition(Transform tr, int index)
 		{
-			tr.position = boardScript.NextPositionPlayer();
+			tr.position = boardScript.NextPositionPlayer(index);
 		}
 
 		public void NextRound()
