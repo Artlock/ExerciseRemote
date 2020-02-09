@@ -164,7 +164,7 @@ namespace Completed
 			LayoutObjectAtRandom (enemyTiles, enemyCount, enemyCount);
 			
 			//Instantiate the exit tile in the upper right hand corner of our game board
-			Instantiate (exit, new Vector3 (currentColumns - 1, currentRows - 1, 0f), Quaternion.identity);
+			Instantiate (exit, new Vector3 (currentColumns - 1 - columnOffset, currentRows - 1 - rowOffset, 0f), Quaternion.identity);
 		}
 	}
 }
