@@ -201,7 +201,7 @@ namespace Completed
 				yield return new WaitForSeconds(enemies[i].moveTime);
 			}
 			//Once Enemies are done moving, set playersTurn to the index of the first player so the first player may move.
-			playersTurn = 0;
+			playersTurn = playerIndexes[0];
 			
 			//Enemies are done moving, set enemiesMoving to false.
 			enemiesMoving = false;
