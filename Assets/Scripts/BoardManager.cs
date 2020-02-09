@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic; 		//Allows us to use Lists.
-using Random = UnityEngine.Random; 		//Tells Random to use the Unity Engine random number generator.
+using Random = UnityEngine.Random;      //Tells Random to use the Unity Engine random number generator.
+using System.Linq;
 
 namespace Completed
 	
@@ -39,6 +40,7 @@ namespace Completed
 		
 		private Transform boardHolder;									//A variable to store a reference to the transform of our Board object.
 		private List <Vector3> gridPositions = new List <Vector3> ();   //A list of possible locations to place tiles.
+		private List<Vector3> playerPositions = new List<Vector3>();   //A list of possible locations to spawn players.
 		private int currentColumns;
 		private int currentRows;
 
@@ -62,8 +64,36 @@ namespace Completed
 				}
 			}
 		}
+
 		
-		
+		void InitialisePlayerPositions()
+		{
+			//Clear our list playerPositions.
+			playerPositions.Clear();
+
+			// Add bottom line to spawn positions.
+
+			//Loop through x axis (columns).
+			for (int x = 0; x < currentColumns; ++x)
+			{
+				//At each index add a new Vector3 to our list with the x and y coordinates of that position.
+				playerPositions.Add(new Vector3(x - columnOffset, -rowOffset, 0f));
+			}
+
+			// Add left column to spawn positions.
+
+			//Loop through x axis (columns).
+			for (int y = 0; y < currentRows; ++y)
+			{
+				//At each index add a new Vector3 to our list with the x and y coordinates of that position.
+				playerPositions.Add(new Vector3(-columnOffset, y - rowOffset, 0f));
+			}
+
+			// Remove duplicates (1 at least, the bottom left position)
+			playerPositions = playerPositions.Distinct().ToList();
+		}
+
+
 		//Sets up the outer walls and floor (background) of the game board.
 		void BoardSetup ()
 		{
@@ -152,7 +182,10 @@ namespace Completed
 			
 			//Reset our list of gridpositions.
 			InitialiseList ();
-			
+
+			//Reset our player spawn positions.
+			InitialisePlayerPositions();
+
 			//Instantiate a random number of wall tiles based on minimum and maximum, at randomized positions.
 			LayoutObjectAtRandom (wallTiles, wallCount.minimum, wallCount.maximum);
 			
